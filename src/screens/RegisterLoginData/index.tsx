@@ -54,10 +54,23 @@ export function RegisterLoginData() {
       id: String(uuid.v4()),
       ...formData
     }
+    
+    try {
+      const dataKey = '@savepass:logins';
+      const response = await AsyncStorage.getItem(dataKey);
+      const parsedData = JSON.parse(response!) || [];
+      
+      const newLoginListData = [
+        ...parsedData,
+        newLoginData
+      ]
+      await AsyncStorage.setItem(dataKey, JSON.stringify(newLoginListData));
+      navigate("Home");
+    } catch (error) {
+      Alert.alert('Não foi possível cadastrar senha');
+      console.log(error);
+    }
 
-    const dataKey = '@savepass:logins';
-
-    // Save data on AsyncStorage and navigate to 'Home' screen
   }
 
   return (
@@ -73,10 +86,8 @@ export function RegisterLoginData() {
             testID="service-name-input"
             title="Nome do serviço"
             name="service_name"
-            error={
-              // Replace here with real content
-              'Has error ? show error message'
-            }
+            //@ts-ignore
+            error={errors.service_name && errors.service_name.message}
             control={control}
             autoCapitalize="sentences"
             autoCorrect
@@ -85,10 +96,8 @@ export function RegisterLoginData() {
             testID="email-input"
             title="E-mail ou usuário"
             name="email"
-            error={
-              // Replace here with real content
-              'Has error ? show error message'
-            }
+            //@ts-ignore
+            error={errors.email && errors.email.message}
             control={control}
             autoCorrect={false}
             autoCapitalize="none"
@@ -98,9 +107,9 @@ export function RegisterLoginData() {
             testID="password-input"
             title="Senha"
             name="password"
+            //@ts-ignore
             error={
-              // Replace here with real content
-              'Has error ? show error message'
+              errors.password && errors.password.message
             }
             control={control}
             secureTextEntry
@@ -111,6 +120,7 @@ export function RegisterLoginData() {
               marginTop: RFValue(8)
             }}
             title="Salvar"
+            //@ts-ignore
             onPress={handleSubmit(handleRegister)}
           />
         </Form>
